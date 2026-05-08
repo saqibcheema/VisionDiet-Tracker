@@ -43,8 +43,23 @@ class GeminiVisionRepositoryImpl @Inject constructor(
             } else {
                 Result.success(VisionFoodResult(items = items))
             }
+        } catch (e: IllegalStateException) {
+            // Triggered by our API key guard in GeminiVisionService
+            Result.failure(Exception("Gemini API key is not configured. ${e.message}"))
         } catch (e: Exception) {
-            Result.failure(e)
+            val friendlyMessage = when {
+                e.message?.contains("API_KEY_INVALID", ignoreCase = true) == true ||
+                e.message?.contains("API key not valid", ignoreCase = true) == true ->
+                    "Invalid Gemini API key. Please check your local.properties and ensure the key is correct."
+                e.message?.contains("RESOURCE_EXHAUSTED", ignoreCase = true) == true ||
+                e.message?.contains("quota", ignoreCase = true) == true ->
+                    "Gemini API quota exceeded. Please wait a moment or check your Google AI Studio quota."
+                e.message?.contains("Unable to resolve host", ignoreCase = true) == true ||
+                e.message?.contains("timeout", ignoreCase = true) == true ->
+                    "Network error. Please check your internet connection and try again."
+                else -> "Gemini Vision error: ${e.message ?: "Unknown error"}"
+            }
+            Result.failure(Exception(friendlyMessage))
         }
     }
 }

@@ -11,9 +11,13 @@ import javax.inject.Singleton
 class GeminiVisionService @Inject constructor() {
 
     private val model by lazy {
+        val apiKey = BuildConfig.GEMINI_API_KEY
+        check(apiKey.isNotBlank()) {
+            "GEMINI_API_KEY is missing! Add it to local.properties:\nGEMINI_API_KEY=your_key_here"
+        }
         GenerativeModel(
             modelName = "gemini-2.0-flash",
-            apiKey = BuildConfig.GEMINI_API_KEY
+            apiKey = apiKey
         )
     }
 

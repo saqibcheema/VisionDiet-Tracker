@@ -174,6 +174,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideGeminiVisionRepository(
-        impl: GeminiVisionRepositoryMock   // ✅ MOCK API
+        impl: GeminiVisionRepositoryImpl   // ✅ REAL Gemini Vision API
     ): GeminiVisionRepository = impl
 }
